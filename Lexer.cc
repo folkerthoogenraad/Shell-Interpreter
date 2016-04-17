@@ -13,7 +13,7 @@ inline bool isDigit(char c)
 
 inline bool isSpecial(char c)
 {
-  return c == '?' || c == '#' || c == '/' || c == '-';
+  return c == '?' || c == '#' || c == '/' || c == '-' || c == '.';
 }
 
 inline bool isLiteral(char c)

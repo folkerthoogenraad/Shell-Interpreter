@@ -1,0 +1,4 @@
+_deps
+*.o
+*.gch
+main

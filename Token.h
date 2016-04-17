@@ -25,6 +25,10 @@ public:
     return type;
   }
 
+  inline std::string getData(){
+    return data;
+  }
+
   friend std::ostream& operator<<(std::ostream&, const Token&);
   friend std::ostream& operator<<(std::ostream&, const TokenType&);
 

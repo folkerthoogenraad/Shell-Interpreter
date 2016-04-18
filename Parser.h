@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include "Lexer.h"
+#include "Command.h"
 
 class Parser
 {
@@ -20,10 +21,11 @@ public:
     return lexer;
   }
 
-  void parse();
+  Command* parse();
 
 private:
-  void parseExpression();
+  Command* parseCommand();
+  Command* parseSequence();
 };
 
 #endif

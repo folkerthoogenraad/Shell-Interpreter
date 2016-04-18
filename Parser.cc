@@ -1,7 +1,8 @@
 #include "Parser.h"
 #include <vector>
 
-#define UNEXPECTED_TOKEN(GOT, EXPECTED) std::cerr << "Unexpected token : " << GOT << ". Expected token of type " << EXPECTED << std::endl;
+#define UNEXPECTED_TOKEN(GOT, EXPECTED) std::cerr << "Unexpected token : " << GOT << ". Expected token of type " << EXPECTED << std::endl
+#define SYNTAX_ERROR(ERROR) std::cerr << "Syntax error: " << ERROR << std::endl
 
 Parser::Parser(Lexer *lex)
   : lexer(lex)
@@ -15,58 +16,98 @@ Parser::~Parser()
   //Do nothing again
 }
 
-void Parser::parse()
+Command* Parser::parse()
 {
   //Right hand side
-  parseExpression();
+  return parseSequence();
+}
+
+Command *Parser::parseSequence()
+{
+  Command *lhs = parseCommand();
 
   Token *token = lexer->current();
 
   if(token == 0)
-    return;
+    return 0;
 
   if(token->getType() == Token::PIPE){
-    std::cout << "Pipe this to: " << std::endl;
+    delete token;
+
     lexer->next();
-    parseExpression();
+
+    Command *rhs = parseSequence();
+
+    if(!rhs){
+      SYNTAX_ERROR("Unconnected Pipe!");
+      return 0;
+    }
+
+    lhs->setRedirect(rhs);
   }
-  else if(token->getType() == Token::OUTPUT){
-    std::cout << "Output to : " << std::endl;
+
+  else if(token->getType() == Token::OUTPUT || token->getType() == Token::APPEND){
     Token *file = lexer->next();
 
     if(file->getType() != Token::LITERAL){
       UNEXPECTED_TOKEN(*token, Token::LITERAL);
-      return;
+      return 0;
     }
 
-    std::cout << file->getData() << std::endl;
+    lhs->setOutput(file->getData());
+    lhs->setAppend(token->getType() == Token::APPEND);
 
+    delete token;
+    delete file;
+
+    //Consume
     lexer->next();
-
   }
+
+  else if(token->getType() == Token::INPUT){
+
+    //Get the token after stuff
+    Token *file = lexer->next();
+
+    //If its not a file name
+    if(file->getType() != Token::LITERAL){
+      UNEXPECTED_TOKEN(*token, Token::LITERAL);
+      return 0;
+    }
+
+    lhs->setInput(file->getData());
+
+    delete token;
+    delete file;
+
+    //Consume
+    lexer->next();
+  }
+
+  return lhs;
 }
 
-void Parser::parseExpression()
+Command *Parser::parseCommand()
 {
   Token *token = lexer->current();
 
   if(token->getType() != Token::LITERAL){
     UNEXPECTED_TOKEN(*token, Token::LITERAL);
-    return;
+    delete token;
+    return 0;
   }
 
-  std::string name = token->getData();
+  Command *cmd = new Command(token->getData());
 
-  std::vector<std::string> arguments;
+  //Clean up the current token
+  delete token;
 
   while((token = lexer->next()) && token->getType() == Token::LITERAL){
-    arguments.push_back(token->getData());
+    cmd->addArgument(token->getData());
+
+    //Clean up the argument
+    delete token;
   }
 
-  std::cout << "Executing " << name << " with arguments ";
-  for(auto i = arguments.begin(); i != arguments.end(); i++){
-    std::cout << *i << ", ";
-  }
-
-  std::cout << std::endl;
+  return cmd;
 }

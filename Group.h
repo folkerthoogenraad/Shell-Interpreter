@@ -20,6 +20,7 @@ public:
   void addCommand(Command*);
 
   friend std::ostream& operator<<(std::ostream&, const Group&);
+  friend class Executer;
 };
 
 #endif

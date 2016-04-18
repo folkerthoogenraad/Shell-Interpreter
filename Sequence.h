@@ -19,6 +19,7 @@ public:
   void addGroup(Group*);
 
   friend std::ostream& operator<<(std::ostream&, const Sequence&);
+  friend class Executer;
 };
 
 #endif

@@ -33,6 +33,7 @@ public:
   ~Command();
 
   friend std::ostream& operator<<(std::ostream&, const Command&);
+  friend class Executer;
 };
 
 #endif

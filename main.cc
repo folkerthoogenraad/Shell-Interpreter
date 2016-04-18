@@ -4,6 +4,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "Group.h"
+#include "Executer.h"
 
 /*
 
@@ -20,7 +21,7 @@ a < b       executes a and reads input from file b
 
 
 int main(){
-  std::stringstream stream("echo \"This is some random text\" > hans.txt ; Pizza is nice <3");
+  std::stringstream stream("ls -all");
 
   Lexer lexer(&stream);
   lexer.setIgnoreWhitespace(true);
@@ -29,6 +30,10 @@ int main(){
 
   Sequence *sequence = parser.parse();
 
-  std::cout << *sequence << std::endl;
+  Executer executer;
 
+  executer.execute(sequence);
+
+  //Don't forget to clean up!
+  delete sequence;
 }

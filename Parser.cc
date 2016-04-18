@@ -16,27 +16,99 @@ Parser::~Parser()
   //Do nothing again
 }
 
-Command* Parser::parse()
+Sequence* Parser::parse()
 {
-  //Right hand side
   return parseSequence();
 }
 
-Command *Parser::parseSequence()
+Sequence* Parser::parseSequence()
+{
+  Sequence *s = new Sequence();
+
+  while(true){
+    Group *p = parseGroup();
+
+    if(p == 0)
+      break;
+
+    s->addGroup(p);
+
+    Token *token = lexer->current();
+
+    if(token->getType() == Token::SEMICOLON){
+      delete token;
+      lexer->next();
+    }else{
+      break;
+    }
+  }
+
+  return s;
+}
+
+Group* Parser::parseGroup()
+{
+  Group *g = new Group();
+
+  while(true){
+    Command *cmd = parseChain();
+
+    if(cmd == 0)
+      break;
+
+    g->addCommand(cmd);
+
+    Token *token = lexer->current();
+
+    if(token->getType() == Token::AND){
+      delete token;
+      lexer->next();
+    }else{
+      break;
+    }
+  }
+
+  return g;
+}
+
+Command *Parser::parseChain()
 {
   Command *lhs = parseCommand();
 
   Token *token = lexer->current();
 
   if(token == 0)
-    return 0;
+    return lhs;
+
+  if(token->getType() == Token::INPUT){
+
+    //Get the token after stuff
+    Token *file = lexer->next();
+
+    //If its not a file name
+    if(file->getType() != Token::LITERAL){
+      UNEXPECTED_TOKEN(*token, Token::LITERAL);
+      return 0;
+    }
+
+    lhs->setInput(file->getData());
+
+    delete token;
+    delete file;
+
+    //Consume
+    token = lexer->next();
+  }
+
+  if(token == 0)
+    return lhs;
 
   if(token->getType() == Token::PIPE){
     delete token;
 
     lexer->next();
 
-    Command *rhs = parseSequence();
+    Command *rhs = parseChain();
 
     if(!rhs){
       SYNTAX_ERROR("Unconnected Pipe!");
@@ -56,26 +128,6 @@ Command *Parser::parseSequence()
 
     lhs->setOutput(file->getData());
     lhs->setAppend(token->getType() == Token::APPEND);
-
-    delete token;
-    delete file;
-
-    //Consume
-    lexer->next();
-  }
-
-  else if(token->getType() == Token::INPUT){
-
-    //Get the token after stuff
-    Token *file = lexer->next();
-
-    //If its not a file name
-    if(file->getType() != Token::LITERAL){
-      UNEXPECTED_TOKEN(*token, Token::LITERAL);
-      return 0;
-    }
-
-    lhs->setInput(file->getData());
 
     delete token;
     delete file;

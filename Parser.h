@@ -3,6 +3,8 @@
 
 #include "Lexer.h"
 #include "Command.h"
+#include "Group.h"
+#include "Sequence.h"
 
 class Parser
 {
@@ -21,11 +23,13 @@ public:
     return lexer;
   }
 
-  Command* parse();
+  Sequence* parse();
 
 private:
+  Sequence* parseSequence();
+  Group* parseGroup();
+  Command* parseChain();
   Command* parseCommand();
-  Command* parseSequence();
 };
 
 #endif

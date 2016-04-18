@@ -44,14 +44,12 @@ void Command::setAppend(bool append)
 std::ostream& operator<<(std::ostream& out, const Command& cmd)
 {
   out << cmd.name;
-  out << "(";
+  out << "";
   for(auto i = cmd.args.begin(); i != cmd.args.end(); i++){
-    if(i != cmd.args.begin())
-      out << ", ";
+    out << " ";
 
-    out << *i;
+    out << "\"" << *i << "\"";
   }
-  out << ")";
 
   if(cmd.hasOutput()){
     out << " >";

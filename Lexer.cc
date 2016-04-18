@@ -21,6 +21,16 @@ inline bool isLiteral(char c)
   return isDigit(c) || isCharacter(c) || isSpecial(c);
 }
 
+inline bool isAnd(char c)
+{
+  return c == '&';
+}
+
+inline bool isSemicolon(char c)
+{
+  return c == ';';
+}
+
 inline bool isWhitespace(char c)
 {
   return c == '\n' || c == '\r' || c == '\t' || c == ' ';
@@ -192,6 +202,28 @@ Token *Lexer::next()
     nextChar();
 
     c = new Token(Token::PIPE, line, charIndex, output.str());
+    return c;
+  }
+
+  else if(isSemicolon(currentChar())){
+    std::stringstream output;
+    output << currentChar();
+
+    //Consume token
+    nextChar();
+
+    c = new Token(Token::SEMICOLON, line, charIndex, output.str());
+    return c;
+  }
+
+  else if(isAnd(currentChar())){
+    std::stringstream output;
+    output << currentChar();
+
+    //Consume token
+    nextChar();
+
+    c = new Token(Token::AND, line, charIndex, output.str());
     return c;
   }
 

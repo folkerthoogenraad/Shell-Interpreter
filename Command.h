@@ -30,7 +30,7 @@ public:
   inline bool hasInput() const {return input.length() > 0;}
   inline bool hasRedirect() const {return redirect != 0;}
 
-  virtual ~Command();
+  ~Command();
 
   friend std::ostream& operator<<(std::ostream&, const Command&);
 };

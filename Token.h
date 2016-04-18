@@ -7,7 +7,7 @@ class Token
 {
 public:
   enum TokenType{
-    LITERAL, PIPE, INPUT, OUTPUT, APPEND, WHITESPACE,
+    LITERAL, PIPE, INPUT, OUTPUT, APPEND, WHITESPACE, SEMICOLON, AND
   };
 
 private:

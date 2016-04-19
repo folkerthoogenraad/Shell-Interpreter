@@ -13,7 +13,9 @@ inline bool isDigit(char c)
 
 inline bool isSpecial(char c)
 {
-  return c == '?' || c == '#' || c == '/' || c == '-' || c == '.' || c == '*';
+  return c == '?' || c == '#' || c == '/' || c == '-' || c == '.' || c == '*' || c == '@' || c == ':'
+  || c == '%' || c == '!' || c == '^' || c == ',' || c == '+' || c == '(' || c == ')' || c == '`' || c == '\''
+  || c == '[' || c == ']' || c == '{' || c == '}' || c == '=' || c == '$' || c == '_' || c == '~';
 }
 
 inline bool isLiteral(char c)
@@ -54,6 +56,11 @@ inline bool isInput(char c)
 inline bool isOutput(char c)
 {
   return c == '>';
+}
+
+inline bool isEscape(char c)
+{
+  return c == '\\';
 }
 
 Lexer::Lexer(std::istream *in) : in(in), c(0), currentCharacter(0), done(false)
@@ -112,13 +119,29 @@ Token *Lexer::next()
 
   //Get the current character
 
-  //TODO add \ stuff
-  if(isLiteral(currentChar())){
+  if(isLiteral(currentChar()) || isEscape(currentChar())){
     std::stringstream output;
+
+    //TODO test this
+    if(isEscape(currentChar())){
+      nextChar();
+
+      if(done){
+        c = 0;
+        return 0;
+      }
+    }
+
     output << currentChar();
 
     //Last character in the stream is by definition not literal (0-9 A-z)
-    while(isLiteral(nextChar())){
+    while(isLiteral(nextChar()) || isEscape(currentChar())){
+      if(isEscape(currentChar())){
+        nextChar();
+        if(done){
+          break;
+        }
+      }
       output << currentChar();
     }
 
@@ -131,11 +154,27 @@ Token *Lexer::next()
   else if(isQuotation(currentChar())){
     std::stringstream output;
 
-
     //while it does not find the quotation, and the input is ready to read
     //and the while
     while(!isQuotation(nextChar()) && !done){
-      output << currentCharacter;
+      if(isEscape(currentChar())){
+
+        nextChar();
+        if(!done){
+          if(isQuotation(currentChar())){
+            //Append " only
+            output << '"';
+          }else{
+            //Append both
+            output << '\\' << currentChar();
+          }
+        }else{
+          //Append this last char anyway, it doesn't really matter
+          output << '\\';
+        }
+      }else{
+        output << currentChar();
+      }
     }
 
     //Consume the "

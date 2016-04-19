@@ -28,11 +28,13 @@ int main(int argc, char **argv){
   std::cout << "(C) Copyright 2016-2016 Apryx Corp." << std::endl;
   std::cout << std::endl;
 
-  execute("echo hans | grep an > output.txt ; cat output.txt");
+  // execute("echo hans | grep an > output.txt ; cat output.txt");
 
   bool running = true;
+  char cwd[1024];
   while(running){
-    std::cout << "C:/> ";
+    getcwd(cwd, 1024);
+    std::cout << "C:" << cwd << "> ";
 
     std::string line;
     getline(std::cin, line);
@@ -65,6 +67,17 @@ void execute(std::string line)
   Parser parser(&lexer);
 
   Sequence *sequence = parser.parse();
+
+  if(lexer.hasError()){
+    std::cout << "Lexical error occurred. Please check your spelling" << std::endl;
+    return;
+  }
+
+  if(parser.hasError()){
+    std::cout << "Parsing error occurred. Please check your grammar" << std::endl;
+    delete sequence;
+    return;
+  }
 
   Executer executer;
 

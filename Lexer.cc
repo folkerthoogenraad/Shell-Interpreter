@@ -13,7 +13,7 @@ inline bool isDigit(char c)
 
 inline bool isSpecial(char c)
 {
-  return c == '?' || c == '#' || c == '/' || c == '-' || c == '.';
+  return c == '?' || c == '#' || c == '/' || c == '-' || c == '.' || c == '*';
 }
 
 inline bool isLiteral(char c)
@@ -229,6 +229,7 @@ Token *Lexer::next()
 
 
   else{
+    error = true;
     std::cout << "Unknown character '" << currentChar() << "' at " << line << ":" << charIndex << std::endl;
     nextChar();
     c = 0;

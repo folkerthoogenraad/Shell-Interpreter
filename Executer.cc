@@ -140,7 +140,9 @@ void Executer::execute(Command *cmd)
 }
 
 /*
- * Executes Command on this process
+ * Executes Command on this process.
+ *
+ * Splits into 3 processes, one overhead and two childs
 */
 void Executer::executeRaw(Command *cmd)
 {
@@ -176,7 +178,6 @@ void Executer::executeRaw(Command *cmd)
   }
 
   //Write the output to other process
-  //TODO let the redirection be done by an overhead (for example, the group or something. I'm not sure where yet, but currently the gandchild sometimes isn't finished when teh parent is, and thus the output will not be correct)
   if(cmd->hasRedirect()){
     int p[2];
     int status = pipe(p);
@@ -198,18 +199,60 @@ void Executer::executeRaw(Command *cmd)
       dup2(p[0], STDIN_FILENO);
       close(p[0]);
       close(p[1]);
-      //TODO maybe seround this by forks?
       executeRaw(cmd->redirect);
     }
 
+    //Parent process
     else{
-      dup2(p[1], STDOUT_FILENO);
-      close(p[0]);
-      close(p[1]);
+      int pid2 = fork();
+
+      if(pid2 < 0){
+        FORK_ERROR();
+        return;
+      }
+
+      //Child process :D
+      if(pid2 == 0){
+        dup2(p[1], STDOUT_FILENO);
+        close(p[0]);
+        close(p[1]);
+        //Execute self
+        execvp(cmd->name.c_str(), toCharPP(cmd->args));
+        std::cerr << "Coudn't locate command: " << cmd->name << std::endl;
+      }
+
+      //Parent parent
+      else{
+        //Don't forget to close the just duplicated dubliliedo
+        close(p[0]);
+        close(p[1]);
+
+        int status;
+
+        waitpid(pid2, &status, 0);
+
+
+        if(status != 0){
+          EXECUTION_ERROR(status);
+        }
+
+        waitpid(pid, &status, 0);
+
+        if(status != 0){
+          EXECUTION_ERROR(status);
+        }
+
+        //Dont forget that we are done
+        exit(0);
+      }
     }
+
   }
 
-  //Execute itself
-  //Maybe seround this by forks? Wait for newly created pid afterwards?
-  execvp(cmd->name.c_str(), toCharPP(cmd->args));
+  else{
+    //Execute itself
+    execvp(cmd->name.c_str(), toCharPP(cmd->args));
+    std::cerr << "Coudn't locate command: " << cmd->name << std::endl;
+  }
+
 }

@@ -18,6 +18,7 @@ private:
   bool ignoreWhitespace = true;
 
   bool done;
+  bool error = false;
 
 public:
   Lexer(std::istream *in);
@@ -30,6 +31,7 @@ public:
   inline char currentChar();
   inline char nextChar();
   inline int  currentLine();
+  inline bool hasError(){return error;}
 
   inline void setIgnoreWhitespace(bool w){ignoreWhitespace = w;}
 

@@ -1,8 +1,8 @@
 #include "Parser.h"
 #include <vector>
 
-#define UNEXPECTED_TOKEN(GOT, EXPECTED) std::cerr << __LINE__ << "Unexpected token : " << GOT << ". Expected token of type " << EXPECTED << std::endl
-#define SYNTAX_ERROR(ERROR) std::cerr << "Syntax error: " << ERROR << std::endl
+#define UNEXPECTED_TOKEN(GOT, EXPECTED) std::cerr << "Parser(" << __LINE__ << ") " << "Unexpected token : " << GOT << ". Expected token of type " << EXPECTED << std::endl; error = true;
+#define SYNTAX_ERROR(ERROR) std::cerr << "Parser(" << __LINE__ << ") " << "Syntax error: " << ERROR << std::endl; error = true;
 
 Parser::Parser(Lexer *lex)
   : lexer(lex)
@@ -28,12 +28,16 @@ Sequence* Parser::parseSequence()
   while(true){
     Group *p = parseGroup();
 
-    if(p == 0)
+    if(p == 0){
       break;
+    }
 
     s->addGroup(p);
 
     Token *token = lexer->current();
+
+    if(token == 0)
+      break;
 
     if(token->getType() == Token::SEMICOLON){
       delete token;
@@ -53,12 +57,16 @@ Group* Parser::parseGroup()
   while(true){
     Command *cmd = parseChain();
 
-    if(cmd == 0)
+    if(cmd == 0){
       break;
+    }
 
     g->addCommand(cmd);
 
     Token *token = lexer->current();
+
+    if(token == 0)
+     break;
 
     if(token->getType() == Token::AND){
       delete token;
@@ -75,6 +83,10 @@ Command *Parser::parseChain()
 {
   Command *lhs = parseCommand();
 
+  if(lhs == 0){
+    return 0;
+  }
+
   Token *token = lexer->current();
 
   if(token == 0)
@@ -84,6 +96,11 @@ Command *Parser::parseChain()
 
     //Get the token after stuff
     Token *file = lexer->next();
+
+    if(file == 0){
+      UNEXPECTED_TOKEN("No token", Token::LITERAL);
+      return lhs;
+    }
 
     //If its not a file name
     if(file->getType() != Token::LITERAL){
@@ -106,7 +123,12 @@ Command *Parser::parseChain()
   if(token->getType() == Token::PIPE){
     delete token;
 
-    lexer->next();
+    Token *t = lexer->next();
+
+    if(t == 0){
+      SYNTAX_ERROR("Unconnected Pipe!");
+      return 0;
+    }
 
     Command *rhs = parseChain();
 
@@ -120,6 +142,11 @@ Command *Parser::parseChain()
 
   else if(token->getType() == Token::OUTPUT || token->getType() == Token::APPEND){
     Token *file = lexer->next();
+
+    if(file == 0){
+      UNEXPECTED_TOKEN("No token", Token::LITERAL);
+      return lhs;
+    }
 
     if(file->getType() != Token::LITERAL){
       UNEXPECTED_TOKEN(*file, Token::LITERAL);
@@ -142,6 +169,10 @@ Command *Parser::parseChain()
 Command *Parser::parseCommand()
 {
   Token *token = lexer->current();
+
+  if(token == 0){
+    return 0;
+  }
 
   if(token->getType() != Token::LITERAL){
     UNEXPECTED_TOKEN(*token, Token::LITERAL);

@@ -10,6 +10,7 @@ class Parser
 {
 private:
   Lexer *lexer;
+  bool error = false;
 
 public:
   Parser(Lexer *lex);
@@ -22,6 +23,8 @@ public:
   inline Lexer *getLexer(){
     return lexer;
   }
+
+  inline bool hasError(){return error;}
 
   Sequence* parse();
 

@@ -105,7 +105,6 @@ int Lexer::currentLine()
 
 Token *Lexer::next()
 {
-
   //if we are done
   if(done){
     return 0;
@@ -186,6 +185,7 @@ Token *Lexer::next()
     //Check if the next is >, for >>
     if(isOutput(nextChar())){
       output << currentChar();
+      nextChar(); //Consume the rest of append
       c = new Token(Token::APPEND, line, charIndex, output.str());
     }else{
       c = new Token(Token::OUTPUT, line, charIndex, output.str());

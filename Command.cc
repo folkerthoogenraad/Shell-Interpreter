@@ -3,7 +3,8 @@
 
 Command::Command(const std::string &name) : redirect(0), name(name)
 {
-
+  //First argument is always the name
+  args.push_back(name);
 }
 
 Command::~Command()

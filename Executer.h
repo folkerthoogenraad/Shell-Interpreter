@@ -14,6 +14,9 @@ public:
   void execute(Sequence *sequence);
   void execute(Group *group);
   void execute(Command *cmd);
+
+private:
+  void executeRaw(Command *cmd);
 };
 
 #endif

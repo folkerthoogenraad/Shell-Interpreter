@@ -1,7 +1,7 @@
 #include "Parser.h"
 #include <vector>
 
-#define UNEXPECTED_TOKEN(GOT, EXPECTED) std::cerr << "Unexpected token : " << GOT << ". Expected token of type " << EXPECTED << std::endl
+#define UNEXPECTED_TOKEN(GOT, EXPECTED) std::cerr << __LINE__ << "Unexpected token : " << GOT << ". Expected token of type " << EXPECTED << std::endl
 #define SYNTAX_ERROR(ERROR) std::cerr << "Syntax error: " << ERROR << std::endl
 
 Parser::Parser(Lexer *lex)
@@ -122,7 +122,7 @@ Command *Parser::parseChain()
     Token *file = lexer->next();
 
     if(file->getType() != Token::LITERAL){
-      UNEXPECTED_TOKEN(*token, Token::LITERAL);
+      UNEXPECTED_TOKEN(*file, Token::LITERAL);
       return 0;
     }
 

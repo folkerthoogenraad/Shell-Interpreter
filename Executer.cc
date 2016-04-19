@@ -198,6 +198,7 @@ void Executer::executeRaw(Command *cmd)
       dup2(p[0], STDIN_FILENO);
       close(p[0]);
       close(p[1]);
+      //TODO maybe seround this by forks?
       executeRaw(cmd->redirect);
     }
 
@@ -209,5 +210,6 @@ void Executer::executeRaw(Command *cmd)
   }
 
   //Execute itself
+  //Maybe seround this by forks? Wait for newly created pid afterwards?
   execvp(cmd->name.c_str(), toCharPP(cmd->args));
 }

@@ -46,6 +46,7 @@ int main(int argc, char **argv){
 
   std::cout << ANSI_COLOR_CYAN << "Apryx Shell XP [Version 1.0.0000]" << std::endl;
   std::cout << "(C) Copyright 2016-2016 Apryx Corp." << std::endl;
+  std::cout << "Type :help for help with commands" << std::endl;
   std::cout << ANSI_COLOR_RESET << std::endl;
 
   // execute("echo hans | grep an > output.txt ; cat output.txt");

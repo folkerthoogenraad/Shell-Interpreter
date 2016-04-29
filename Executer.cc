@@ -161,9 +161,11 @@ void Executer::executeRaw(Command *cmd)
 
   //Write the output to file
   if(cmd->hasOutput()){
-    mode_t per = O_WRONLY | O_CREAT | O_TRUNC;
+    mode_t per = O_WRONLY | O_CREAT;
     if(cmd->getAppend()){
       per |= O_APPEND;
+    }else{
+      per |= O_TRUNC;
     }
 
     int fd = open(cmd->output.c_str(), per, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);

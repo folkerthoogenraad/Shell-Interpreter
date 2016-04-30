@@ -5,6 +5,11 @@
 #include <vector>
 #include "Token.h"
 
+/**
+ * Command class, representing a command or command pipeline. The command has
+ * an output operator, input operator and pipeline operator (to the next
+ * Command, like a linked list)
+*/
 class Command
 {
 private:

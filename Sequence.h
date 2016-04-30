@@ -5,7 +5,12 @@
 #include "Group.h"
 
 /*
- * Executes a group of commands simultaniously
+ * Sequence represents a list of Groups that can be executed in order.
+ * Examples are:
+ * ls -all; cat output.txt
+ * echo "Text is cool!" > file.txt ; cat file.txt
+ *
+ * A Sequence can have 0 or more groups.
 */
 class Sequence
 {

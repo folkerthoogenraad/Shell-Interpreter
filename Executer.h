@@ -5,6 +5,9 @@ class Sequence;
 class Group;
 class Command;
 
+/**
+ * Executer class is responseable for executing Commands, Groups and Sequences.
+*/
 class Executer
 {
 public:

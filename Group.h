@@ -6,7 +6,11 @@
 #include "Command.h"
 
 /*
- * Executes a group of commands simultaniously
+ * Group represents a group of commands that can be executed simultaneously. Examples are:
+ * ls -all & echo "Some Text!"
+ * cat aardappel.txt > output.txt & curl www.google.nl
+ *
+ * A Group can have 0 or more Commands.
 */
 class Group
 {

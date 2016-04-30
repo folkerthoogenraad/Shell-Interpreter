@@ -6,6 +6,10 @@
 #include "Group.h"
 #include "Sequence.h"
 
+/**
+ * The parser parses input from the lexer. It generates the abstract syntax
+ * tree. The AST in this case is the Sequence, Group and Command.
+*/
 class Parser
 {
 private:

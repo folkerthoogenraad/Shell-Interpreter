@@ -4,6 +4,9 @@
 #include <iostream>
 #include "Token.h"
 
+/**
+ * The lexer generates a stream of Tokens from a given input stream. 
+*/
 class Lexer
 {
 private:
